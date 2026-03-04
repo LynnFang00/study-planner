@@ -9,14 +9,14 @@
   --danger: #C0533E;
   --warning: #D4892A;
 
-  --bg-app: #fcf9e8;
+  --bg-app: #fcfbf2;
   --bg-primary: #ffffff;
-  --bg-secondary: #f2ecc8;
-  --bg-tertiary: #e6dfa4;
-  --bg-hover: #f5f0d8;
+  --bg-secondary: #eeead4;
+  --bg-tertiary: #e2ddb8;
+  --bg-hover: #f3f0e2;
 
-  --border: #c8bc78;
-  --border-light: #ddd49c;
+  --border: #cac490;
+  --border-light: #dad8ac;
 
   --text-primary: #2C1A0E;
   --text-secondary: #7A5C40;
@@ -66,7 +66,7 @@ body {
   top: 0;
   bottom: 0;
   width: var(--sidebar-width);
-  background: #fefcf2;
+  background: #fefefe;
   border-right: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
