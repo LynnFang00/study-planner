@@ -1,0 +1,11 @@
+# cache-bust-1
+fastapi==0.115.0
+uvicorn==0.32.0
+sqlalchemy==2.0.36
+pydantic==2.10.3
+python-multipart==0.0.12
+httpx==0.27.2
+python-dotenv==1.0.0
+pypdf2==3.0.1
+psycopg2-binary==2.9.10
+python-jose[cryptography]==3.3.0
