@@ -9,22 +9,22 @@
   --danger: #C0533E;
   --warning: #D4892A;
 
-  --bg-app: #fcf1c5;
+  --bg-app: #fcf9e8;
   --bg-primary: #ffffff;
-  --bg-secondary: #f6e898;
-  --bg-tertiary: #edd970;
-  --bg-hover: #f8edac;
+  --bg-secondary: #f2ecc8;
+  --bg-tertiary: #e6dfa4;
+  --bg-hover: #f5f0d8;
 
-  --border: #c8b264;
-  --border-light: #dcc87c;
+  --border: #c8bc78;
+  --border-light: #ddd49c;
 
   --text-primary: #2C1A0E;
   --text-secondary: #7A5C40;
   --text-tertiary: #A08868;
 
-  --shadow-sm: 0 1px 3px 0 rgba(80,55,0,0.08), 0 1px 2px -1px rgba(80,55,0,0.05);
-  --shadow: 0 4px 12px -1px rgba(80,55,0,0.10), 0 2px 6px -2px rgba(80,55,0,0.07);
-  --shadow-lg: 0 10px 30px -3px rgba(80,55,0,0.12), 0 4px 8px -4px rgba(80,55,0,0.07);
+  --shadow-sm: 0 1px 3px 0 rgba(70,55,10,0.07), 0 1px 2px -1px rgba(70,55,10,0.05);
+  --shadow: 0 4px 12px -1px rgba(70,55,10,0.09), 0 2px 6px -2px rgba(70,55,10,0.06);
+  --shadow-lg: 0 10px 30px -3px rgba(70,55,10,0.11), 0 4px 8px -4px rgba(70,55,10,0.07);
 
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 
@@ -66,7 +66,7 @@ body {
   top: 0;
   bottom: 0;
   width: var(--sidebar-width);
-  background: #fdf8d4;
+  background: #fefcf2;
   border-right: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
@@ -863,6 +863,36 @@ body {
 @keyframes toast-slide-up {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== GUEST BANNER ===== */
+.guest-banner {
+  background: var(--primary);
+  color: white;
+  text-align: center;
+  padding: 9px 16px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.guest-banner button {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 6px;
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.guest-banner button:hover {
+  background: rgba(255,255,255,0.35);
 }
 
 /* ===== AUTH ===== */

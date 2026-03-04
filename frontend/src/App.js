@@ -1,4 +1,22 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+
+const now = Date.now();
+const d = (offsetDays) => new Date(now + offsetDays * 86400000).toISOString();
+const DEMO_TASKS = [
+  { id: 1, title: 'Midterm exam review', course: 'ECO102', due_date: d(-1), estimated_minutes: 120, priority: 4, status: 'todo' },
+  { id: 2, title: 'Problem Set 3', course: 'MAT224', due_date: d(0), estimated_minutes: 90, priority: 3, status: 'todo' },
+  { id: 3, title: 'Weekly reading', course: 'RLG232', due_date: d(0), estimated_minutes: 45, priority: 2, status: 'todo' },
+  { id: 4, title: 'Essay draft', course: 'ECO200', due_date: d(3), estimated_minutes: 180, priority: 4, status: 'todo' },
+  { id: 5, title: 'Lab report', course: 'MAT235', due_date: d(4), estimated_minutes: 60, priority: 3, status: 'todo' },
+  { id: 6, title: 'Final project proposal', course: 'ECO102', due_date: d(14), estimated_minutes: 240, priority: 5, status: 'todo' },
+];
+const DEMO_COURSES = [
+  { id: 1, code: 'ECO102', name: 'Principles of Economics', color: '#C17D3C', term: 'Winter 2026' },
+  { id: 2, code: 'MAT224', name: 'Linear Algebra II', color: '#667eea', term: 'Winter 2026' },
+  { id: 3, code: 'RLG232', name: 'World Religions', color: '#43e97b', term: 'Winter 2026' },
+  { id: 4, code: 'ECO200', name: 'Microeconomic Theory', color: '#fa709a', term: 'Winter 2026' },
+  { id: 5, code: 'MAT235', name: 'Multivariable Calculus', color: '#30cfd0', term: 'Winter 2026' },
+];
 import { api, axiosInstance } from './api/client';
 import './App.css';
 import Calendar from './Calendar';
@@ -133,12 +151,6 @@ function App() {
     }
   }, [clerkLoaded, isSignedIn]);
 
-  // Mount SignIn
-  useEffect(() => {
-    if (clerkLoaded && isSignedIn === false && signInRef.current) {
-      window.Clerk.mountSignIn(signInRef.current);
-    }
-  }, [clerkLoaded, isSignedIn]);
 
   // Browser notifications
   useEffect(() => {
@@ -165,7 +177,12 @@ function App() {
   useEffect(() => {
     if (isSignedIn === undefined) return;
     if (isSignedIn) loadData();
-    else setLoading(false);
+    else {
+      setTasks(DEMO_TASKS);
+      setCourses(DEMO_COURSES);
+      setStreak(5);
+      setLoading(false);
+    }
   }, [isSignedIn]);
 
   const loadData = async () => {
@@ -307,9 +324,16 @@ function App() {
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
   };
 
+  const requireAuth = () => {
+    if (isSignedIn) return true;
+    showToast('Sign in to save your data', 'error');
+    return false;
+  };
+
   // ===== TASK HANDLERS =====
   const handleAddTask = async (e) => {
     e.preventDefault();
+    if (!requireAuth()) return;
     setActionLoading('addTask');
     try {
       await api.createTask({ ...newTask, due_date: new Date(newTask.due_date).toISOString() });
@@ -334,6 +358,7 @@ function App() {
 
   const handleUpdateTask = async (e) => {
     e.preventDefault();
+    if (!requireAuth()) return;
     setActionLoading('updateTask');
     try {
       await api.updateTask(editingTask.id, { ...editForm, due_date: `${editForm.due_date}T${editForm.due_time}:00` });
@@ -345,6 +370,7 @@ function App() {
   };
 
   const handleDeleteTask = async (id) => {
+    if (!requireAuth()) return;
     if (!window.confirm('Delete this task?')) return;
     try { await api.deleteTask(id); showToast('Task deleted'); loadData(); }
     catch { showToast('Failed to delete task', 'error'); }
@@ -352,6 +378,10 @@ function App() {
 
   const handleToggleStatus = async (task) => {
     const newStatus = task.status === 'todo' ? 'done' : 'todo';
+    if (!isSignedIn) {
+      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t));
+      return;
+    }
     try { await api.updateTaskStatus(task.id, newStatus); loadData(); }
     catch (error) { console.error('Error updating task:', error); }
   };
@@ -371,6 +401,7 @@ function App() {
 
   const handleBulkMarkDone = async () => {
     if (selectedTasks.length === 0) return;
+    if (!requireAuth()) return;
     const count = selectedTasks.length;
     try {
       const tasksToUpdate = tasks.filter(t => selectedTasks.includes(t.id));
@@ -384,6 +415,7 @@ function App() {
 
   const handleBulkDelete = async () => {
     if (selectedTasks.length === 0) return;
+    if (!requireAuth()) return;
     if (!window.confirm(`Delete ${selectedTasks.length} selected tasks?`)) return;
     const count = selectedTasks.length;
     try {
@@ -395,6 +427,7 @@ function App() {
 
   const handleBulkMove = async () => {
     if (selectedTasks.length === 0) return;
+    if (!requireAuth()) return;
     const daysToMove = prompt(`Move ${selectedTasks.length} tasks by how many days?`);
     if (!daysToMove) return;
     const days = parseInt(daysToMove);
@@ -420,6 +453,7 @@ function App() {
   // ===== CHECKIN =====
   const handleCheckIn = async (e) => {
     e.preventDefault();
+    if (!requireAuth()) return;
     setActionLoading('checkIn');
     try {
       await api.createCheckIn(checkIn);
@@ -433,6 +467,7 @@ function App() {
   // ===== AI =====
   const handleAiCreateTask = async (e) => {
     e.preventDefault();
+    if (!requireAuth()) return;
     if (!aiInput.trim()) return;
     setActionLoading('aiCreate');
     try {
@@ -445,6 +480,7 @@ function App() {
   };
 
   const handleAiChat = async (question) => {
+    if (!requireAuth()) return;
     if (!question.trim()) return;
     setChatMessages(prev => [...prev, { role: 'user', content: question }]);
     setChatLoading(true);
@@ -523,14 +559,6 @@ function App() {
     );
   }
 
-  if (!isSignedIn) {
-    return (
-      <div className="auth-screen">
-        <h1>Study Planner</h1>
-        <div ref={signInRef} />
-      </div>
-    );
-  }
 
   if (loading) {
     return (
@@ -1022,15 +1050,33 @@ function App() {
           >
             <FiClock size={16} />
           </button>
-          <button className="btn-icon" title="Refresh data" onClick={loadData}>
-            <FiRefreshCw size={16} />
-          </button>
-          <div ref={userButtonRef} />
+          {isSignedIn && (
+            <button className="btn-icon" title="Refresh data" onClick={loadData}>
+              <FiRefreshCw size={16} />
+            </button>
+          )}
+          {isSignedIn ? (
+            <div ref={userButtonRef} />
+          ) : (
+            <button
+              className="btn btn-sm btn-primary"
+              style={{ fontSize: '12px', padding: '5px 10px' }}
+              onClick={() => window.Clerk.openSignIn()}
+            >
+              Sign in
+            </button>
+          )}
         </div>
       </aside>
 
       {/* ===== MAIN VIEW ===== */}
       <main className="main-view">
+        {!isSignedIn && (
+          <div className="guest-banner">
+            You're viewing a demo
+            <button onClick={() => window.Clerk.openSignIn()}>Sign in to save your data</button>
+          </div>
+        )}
         {activeView === 'home' && renderHomeView()}
         {activeView === 'calendar' && renderCalendarView()}
 
